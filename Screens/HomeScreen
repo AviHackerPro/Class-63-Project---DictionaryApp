@@ -1,0 +1,172 @@
+import React, {Component} from 'react';
+import {Text, View, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
+import { Header } from 'react-native-elements';
+
+export default class HomeScreen extends Component {
+    constructor() {
+        super();
+        this.state = {
+            text: '',
+            isSearchPressed: '',
+        };
+    }
+
+    render() {
+        return (
+            <View style={styles.container}>
+                
+                <Header
+                    centerComponent={{
+                        text: 'Pocket Dictionary',
+                        style: { fontSize: 30, color: 'green' },
+                    }}></Header>
+
+                <TextInput
+                    style={styles.inputBox}
+                    onChangeText={(text) => {
+                        this.setState({
+                            text: text,
+                            isSearchPressed: false,
+                            word: "Loading...",
+                            lexicalCategory: '',
+                            examples: [], defination: ''
+                        });
+                    }}
+                    value={this.state.text}
+                />
+
+                <View style={style.detailsContainer}>
+                    <Text style={styles.detailsTitle}>
+                        Word: {""}
+                    </Text>
+                    <Text style={{ fontSize: 18 }}>
+                        {this.state.word}
+                    </Text>
+                </View>
+
+                <View style={style.detailsContainer}>
+                    <Text style={styles.detailsTitle}>
+                        Type: {""}
+                    </Text>
+                    <Text style={{ fontSize: 18 }}>
+                        {this.state.lexicalCategory}
+                    </Text>
+                </View>
+
+                <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                    <Text style={styles.detailsTitle}>
+                        Defination: {""}
+                    </Text>
+                    <Text style={{ fontSize: 18 }}>
+                        {this.state.defination}
+                    </Text>
+                </View>
+
+                <TouchableOpacity
+                    style={styles.searchButton}
+                    onPress={() => {
+                        this.setState({ isSearchPressed: true });
+                        this.getWord(this.state.text)
+                    }}>
+
+                    <Text style={styles.text}>Search</Text>
+                </TouchableOpacity>
+                <Text style={styles.isSearchPressed}>{this.state.isSearchPressed}</Text>
+            </View>
+
+        );
+    }
+}
+
+getWord = (word) => {
+    var searchKeyword = word.toLowerCase()
+    var url = "https://rupinwhitehatjr.github.io/dictionary/" + searchKeyword + ".json"
+    return fetch(url)
+        .then((data) => {
+            if (data.status === 200) 
+            {
+                return data.json()
+            }
+            else 
+            {
+                return null
+            }
+        })
+
+.then((response) => {
+
+    var responseObject = response
+
+    if (responseObject) 
+    {
+
+        var wordData = responseObject.definations[0]
+        var defination = wordData.description
+        var lexicalCategory = wordData.wordtype
+
+        this.setState({
+            "word": this.state.text,
+            "defination": defination,
+            "lexicalCategory": lexicalCategory
+        })
+    }
+    else 
+    {
+        this.setState({
+            "word": this.state.text,
+            "defination": "Not Found",
+        })
+    }
+})
+}
+
+const styles = StyleSheet.create({
+    
+    //container(the interface)
+    container: {
+        flex: 1,
+        backgroundColor: "white"
+    },
+    //
+    
+    //inputText and text
+    inputText: {
+        width: '80%',
+        height: 50,
+        borderWidth: 4,
+        marginTop: 100,
+        alignSelf: 'center',
+        textAlign: 'center'
+    },
+    
+    text: { 
+        fontSize: 18,
+        textAlign: 'center',
+        fontweight: 'bold' 
+        },
+    //
+
+    //searchButton and isSearchPresses
+    searchButton: {
+        backgroundColor: 'orange',
+        width: '40%',
+        height: 30,
+        alignSelf: 'center',
+        marginTop: 20
+        },
+    
+    isSearchPressed: { 
+        textAlign: 'center',
+        fontSize: 30,
+        fontWeight: 'bold'
+        },
+    //
+
+    //detailsContainer(the sub-topics, (Words, Type, Defination))
+    detailsContainer: {
+        fontSize: 18,
+        textAlign: 'left',
+        fontWeight: 'bold'
+        },
+    //
+});
