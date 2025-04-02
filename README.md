@@ -1,1 +1,1 @@
-# Class-63-Project---DictionaryApp
+# Class-63---Dictionary-App-Project
